@@ -1,0 +1,22 @@
+package com.rannunen.assistedreminder2023
+
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+
+class ReminderAppState(
+    val navController:NavHostController
+){
+    fun navigateBack(){
+        navController.popBackStack()
+    }
+}
+
+@Composable
+fun rememberReminderAppState(
+    navController: NavHostController = rememberNavController()
+) = remember(navController){
+    ReminderAppState(navController)
+}
