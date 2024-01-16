@@ -73,9 +73,3 @@ fun Login(
     }
 
 }
-
-//@Preview
-//@Composable
-//fun Preview(){
-//    Login(navController = NavController())
-//}

@@ -46,10 +46,11 @@ fun Reminder(
                 ){
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
-                        contentDescription = null
+                        contentDescription = null,
+                        tint = MaterialTheme.colors.primaryVariant
                     )
                 }
-                Text(text = "Reminder")
+                Text(text = "Reminder", color= MaterialTheme.colors.primaryVariant)
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -109,7 +110,7 @@ fun Reminder(
                     modifier = Modifier.fillMaxWidth()
 
                 ) {
-                    Text(text = "Add reminder")
+                    Text(text = "Add reminder", color = MaterialTheme.colors.primaryVariant)
                 }
             }
         }

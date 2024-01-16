@@ -82,6 +82,7 @@ fun HomeContent(
 
             HomeAppbar(
                 backgroundColor = appBarColor,
+                navController = navController
             )
 
             CategoryTabs(
@@ -102,7 +103,8 @@ fun HomeContent(
 
 @Composable
 private fun HomeAppbar(
-    backgroundColor: Color
+    backgroundColor: Color,
+    navController: NavController
 ){
     TopAppBar(
         title = {
@@ -121,7 +123,7 @@ private fun HomeAppbar(
             IconButton( onClick = {}){
                 Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")
             }
-            IconButton( onClick = {}){
+            IconButton( onClick = {navController.navigate("settings")}){
                 Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "Account")
             }
         }

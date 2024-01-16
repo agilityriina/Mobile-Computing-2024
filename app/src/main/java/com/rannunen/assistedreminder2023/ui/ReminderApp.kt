@@ -8,6 +8,7 @@ import com.rannunen.assistedreminder2023.rememberReminderAppState
 import com.rannunen.assistedreminder2023.ui.Reminder.Reminder
 import com.rannunen.assistedreminder2023.ui.home.Home
 import com.rannunen.assistedreminder2023.ui.login.Login
+import com.rannunen.assistedreminder2023.ui.settings.Settings
 
 @Composable
 fun ReminderApp(
@@ -28,5 +29,10 @@ fun ReminderApp(
         composable(route = "reminder"){
             Reminder(onBackPress = appState::navigateBack)
         }
+
+        composable(route = "settings"){
+            Settings(onBackPress = appState::navigateBack)
+        }
+
     }
 }
