@@ -67,7 +67,7 @@ fun Settings(
             OutlinedTextField(
                 value = "",
                 onValueChange = {},
-                label = {Text("Profile description: I like cats. This account is specifically")},
+                label = {Text("Profile description: I like cats.")},
                 modifier = Modifier.fillMaxWidth(),
                 readOnly = true,
                 enabled = false,

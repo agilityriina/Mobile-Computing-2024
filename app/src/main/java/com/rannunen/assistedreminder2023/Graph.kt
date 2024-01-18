@@ -10,7 +10,7 @@ object Graph {
     lateinit var database: AssistedReminderDatabase
         private set
 
-
+    lateinit var appContext: Context
     val categoryRepository by lazy {
         CategoryRepository(
             categoryDao =  database.categoryDao()
@@ -25,8 +25,8 @@ object Graph {
 
 
     fun provide(context: Context){
+        appContext = context
         database = Room.databaseBuilder(context, AssistedReminderDatabase::class.java, "data.db")
-            .fallbackToDestructiveMigration()
             .allowMainThreadQueries()       // Fix an error "Cannot access database on the main thread
             .build()
     }

@@ -45,20 +45,18 @@ class HomeViewModel (
 
             }. collect { _state.value = it }
         }
-        getCategoriesFromDb()
+        loadCategoriesFromDb()
     }
-
-    // Get all of the categories from a database. Couldn't this be a loop?
-    private fun getCategoriesFromDb(){
+    private fun loadCategoriesFromDb() {
         val list = mutableListOf(
-            Category(name="Very Low"),
-            Category(name="Low"),
-            Category(name="Normal"),
-            Category(name="High"),
-            Category(name="Very High")
+            Category(name = "Very Low"),
+            Category(name = "Low"),
+            Category(name = "Normal"),
+            Category(name = "High"),
+            Category(name = "Very High"),
         )
         viewModelScope.launch {
-            list.forEach { category ->categoryRepository.addCategory(category) }
+            list.forEach { category -> categoryRepository.addCategory(category) }
         }
     }
 }

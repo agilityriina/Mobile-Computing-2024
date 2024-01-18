@@ -1,15 +1,11 @@
 package com.rannunen.assistedreminder2023.ui.home.categoryReminder
 
 
+import android.util.Log
 import androidx.compose.foundation.background
 import com.rannunen.assistedreminder2023.data.entity.Reminder
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Divider
@@ -18,14 +14,11 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -36,6 +29,10 @@ import com.rannunen.assistedreminder2023.data.entity.Category
 import com.rannunen.assistedreminder2023.util.viewModelProviderFactoryOf
 import java.text.SimpleDateFormat
 import java.util.*
+import coil.compose.AsyncImage
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
+import java.io.InputStream
 
 @Composable
 fun CategoryReminder(
@@ -81,9 +78,12 @@ private fun ReminderListItem(
     category: Category,
     modifier: Modifier = Modifier,
 ){
+
     //All of the row clickable
-    ConstraintLayout(modifier = Modifier.fillMaxWidth().background(MaterialTheme.colors.secondary).clickable { onClick() }) {
-        val (divider, reminderTitle, reminderCategory, icon, date) = createRefs()
+    ConstraintLayout(modifier = Modifier
+        .background(MaterialTheme.colors.secondary)
+        .clickable { onClick() }) {
+        val (divider, reminderImage, reminderTitle, reminderDescription, reminderCategory, icon, date, reminderTime) = createRefs()
         //Set dividers between alarms
         Divider(
             Modifier.constrainAs(divider){
@@ -92,59 +92,96 @@ private fun ReminderListItem(
                 width = Dimension.fillToConstraints
             }
         )
-        //title
+        Log.d("Show image", reminder.reminderImage)
+
+        val context = LocalContext.current
+        val inputStream: InputStream? = context.contentResolver.openInputStream(Uri.parse(reminder.reminderImage))
+
+        AsyncImage(
+            model = reminder.reminderImage,
+            contentDescription = "Reminder's picture",
+            modifier = Modifier.constrainAs(reminderImage){
+                width = Dimension.value(150.dp)
+                height = Dimension.value(150.dp)
+            }
+        )
+        // Title
         Text(
             text = reminder.reminderTitle,
-            maxLines = 1,
+            fontWeight = FontWeight.ExtraBold,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.subtitle1,
             modifier = Modifier.constrainAs(reminderTitle){
                 linkTo(
-                    start = parent.start,
+                    start = reminderImage.end,
                     end = icon.start,
-                    startMargin = 2.dp,
-                    endMargin = 18.dp,
+                    startMargin = 10.dp,
+                    endMargin = 4.dp,
                 )
                 top.linkTo(parent.top, margin = 10.dp)
                 width = Dimension.preferredWrapContent
             }
         )
-        //category
+        // Description
         Text(
-            text = category.name,
-            maxLines = 1,
+            text = reminder.reminderDescription,
+            maxLines = 10,
+            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.subtitle2,
-            modifier = Modifier.constrainAs(reminderCategory){
+            modifier = Modifier.constrainAs(reminderDescription){
                 linkTo(
-                    start = parent.start,
+                    start = reminderImage.end,
                     end = icon.start,
                     startMargin = 2.dp,
-                    endMargin = 8.dp,
+                    endMargin = 4.dp,
                 )
-                top.linkTo(reminderTitle.bottom, margin = 5.dp)
-                bottom.linkTo(parent.bottom, 10.dp)
+                top.linkTo(reminderTitle.bottom, margin = 0.dp)
+                bottom.linkTo(parent.bottom, 5.dp)
                 width = Dimension.preferredWrapContent
+                centerHorizontallyTo(reminderTitle)
             }
         )
         
         // Duedate
         Text(
-            text = reminder.reminderDate.formatToString(),
+            text = formatToString(reminder.reminderDate),
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.caption,
             modifier = Modifier.constrainAs(date){
                 linkTo(
-                    start = reminderCategory.end,
+                    start = reminderDescription.start,
                     end = icon.start,
                     startMargin = 8.dp,
                     endMargin = 16.dp
                 )
-                centerVerticallyTo(reminderCategory)
+                centerHorizontallyTo(reminderDescription)
+                top.linkTo(reminderDescription.bottom, margin = 0.dp)
+                bottom.linkTo(parent.bottom, 5.dp)
             }
         )
+
+        // Time
+        Text(
+            text = formatToStringTime(reminder.reminderTime),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier.constrainAs(reminderTime){
+                linkTo(
+                    start = date.start,
+                    end = icon.start,
+                    startMargin = 8.dp,
+                    endMargin = 16.dp
+                )
+                top.linkTo(date.bottom, margin = 0.dp)
+                centerHorizontallyTo(reminderDescription)
+            }
+        )
+
         // Red icon means the alarm is on, white means it's off
         var iconColor by remember { mutableStateOf(Color.Red) }
-        // Alarm-icon
+        // Alarm-icon.. Maybe add a delete button aswell...
         IconButton(
             // Change color red or white depending if it's clicked
             onClick = {iconColor = if (iconColor == Color.Red){
@@ -156,7 +193,7 @@ private fun ReminderListItem(
             modifier = Modifier
                 .size(55.dp)
                 .padding(5.dp)
-                .constrainAs(icon){
+                .constrainAs(icon) {
                     top.linkTo(parent.top, 10.dp)
                     bottom.linkTo(parent.bottom, 10.dp)
                     end.linkTo(parent.end)
@@ -171,10 +208,15 @@ private fun ReminderListItem(
         }
     }
 }
-private fun Date.toDateString(): String{
-    return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(this)
+private fun formatToString(long: Long): String {
+    val date = Date(long)
+    val format = SimpleDateFormat("dd MMMM, yyyy")
+    println(format.format(date))
+    return format.format(date)
 }
 
-private fun Long.formatToString(): String {
-    return SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault()).format(Date(this))
+private fun formatToStringTime(long: Long): String {
+    val time = Date(long)
+    val format = SimpleDateFormat("HH.mm")
+    return format.format(time)
 }
