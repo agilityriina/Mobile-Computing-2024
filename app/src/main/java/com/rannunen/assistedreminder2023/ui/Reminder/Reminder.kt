@@ -4,7 +4,6 @@ import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Bitmap
-import android.util.Log
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -52,12 +51,10 @@ fun Reminder(
     // Registers a photo picker activity launcher in single-select mode. Save URI to database
     val pickMedia = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
-            Log.d("PhotoPicker", "Selected URI: $uri")
             // Give permissions to load image from this uri on relaunch
             context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION )
             uriImage.value = uri.toString()
         } else {
-            Log.d("PhotoPicker", "No media selected")
         }
     }
 
