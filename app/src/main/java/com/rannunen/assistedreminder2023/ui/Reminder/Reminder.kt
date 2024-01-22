@@ -1,7 +1,11 @@
 package com.rannunen.assistedreminder2023.ui.Reminder
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.util.Log
+import android.widget.DatePicker
+import android.widget.TimePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -9,9 +13,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.ArrowDropUp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -24,6 +26,7 @@ import com.rannunen.assistedreminder2023.data.entity.Category
 import com.rannunen.assistedreminder2023.data.entity.Reminder
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.*
 
 @Composable
 fun Reminder(
@@ -41,7 +44,7 @@ fun Reminder(
     val uriImage = rememberSaveable{mutableStateOf("")}
     val context = LocalContext.current
 
-// Registers a photo picker activity launcher in single-select mode. Save URI to database
+    // Registers a photo picker activity launcher in single-select mode. Save URI to database
     val pickMedia = rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocument()) { uri ->
         if (uri != null) {
             Log.d("PhotoPicker", "Selected URI: $uri")
@@ -52,6 +55,33 @@ fun Reminder(
             Log.d("PhotoPicker", "No media selected")
         }
     }
+    // Picking a date
+    val pickerCalendar = Calendar.getInstance()
+
+    val pickerYear: Int = pickerCalendar.get(Calendar.YEAR)
+    val pickerMonth : Int = pickerCalendar.get(Calendar.MONTH)
+    val pickerDay  : Int  = pickerCalendar.get(Calendar.DAY_OF_MONTH)
+
+    // Picking time of day
+    val pickerHour: Int = pickerCalendar.get(Calendar.HOUR)
+    val pickerMinute: Int = pickerCalendar.get(Calendar.MINUTE)
+
+    val pickerDate = remember { mutableStateOf("") }
+    val pickerTime = remember { mutableStateOf("") }
+
+    val pickDate = DatePickerDialog(
+        LocalContext.current,
+        { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
+            pickerDate.value = "$mDayOfMonth.${mMonth+1}.$mYear"
+        },  pickerYear , pickerMonth , pickerDay,
+    )
+
+    val pickTime = TimePickerDialog(
+        LocalContext.current,
+        { _: TimePicker, mHour: Int, mMinute: Int ->
+            pickerTime.value = "$mHour.$mMinute"
+        },  pickerHour, pickerMinute, true
+    )
 
 
     Surface {
@@ -104,11 +134,22 @@ fun Reminder(
                     OutlinedTextField(
                         value = date.value,
                         onValueChange = {date.value = it},
-                        label = {Text("Date. Example: 01.01.2001")},
+                        label = {Text(pickerDate.value)},
+                        readOnly = true,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text
-                        )
+                        ),
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { pickDate.show() },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditCalendar,
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     )
                 }
                 Spacer(modifier = Modifier.height(10.dp))
@@ -117,11 +158,22 @@ fun Reminder(
                     OutlinedTextField(
                         value = time.value,
                         onValueChange = {time.value = it},
-                        label = {Text("Time. Example: 17.30")},
+                        label = {Text(pickerTime.value)},
+                        readOnly = true,
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text
-                        )
+                        ),
+                        trailingIcon = {
+                            IconButton(
+                                onClick = { pickTime.show() },
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.PunchClock,
+                                    contentDescription = null
+                                )
+                            }
+                        }
                     )
                 }
 
@@ -152,8 +204,8 @@ fun Reminder(
                                 Reminder(
                                     reminderTitle = title.value,
                                     reminderDescription = description.value,
-                                    reminderDate = stringToLong(date.value),
-                                    reminderTime = stringToLongTime(time.value),
+                                    reminderDate = stringToLong(pickerDate.value),
+                                    reminderTime = stringToLongTime(pickerTime.value),
                                     reminderCategoryId = getCategoryId(viewState.categories, category.value),
                                     reminderImage = uriImage.value
                                 )

@@ -10,7 +10,9 @@ object Graph {
     lateinit var database: AssistedReminderDatabase
         private set
 
+    // Give context to the whole application
     lateinit var appContext: Context
+
     val categoryRepository by lazy {
         CategoryRepository(
             categoryDao =  database.categoryDao()

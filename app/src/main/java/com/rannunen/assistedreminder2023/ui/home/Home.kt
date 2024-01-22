@@ -31,7 +31,8 @@ fun Home(
     val viewState by viewModel.state.collectAsState()
 
     val selectedCategory = viewState.selectedCategory
-    //Check if empty
+
+    // Check if empty
     if (viewState.categories.isNotEmpty() && selectedCategory != null) {
         Surface(modifier = Modifier.fillMaxSize()){
             HomeContent(
@@ -182,3 +183,4 @@ private fun ChoiceChipContent(
         )
     }
 }
+
