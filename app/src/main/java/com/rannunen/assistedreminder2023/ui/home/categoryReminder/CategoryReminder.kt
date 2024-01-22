@@ -1,7 +1,7 @@
 package com.rannunen.assistedreminder2023.ui.home.categoryReminder
 
 
-import android.util.Log
+import android.graphics.BitmapFactory
 import androidx.compose.foundation.background
 import com.rannunen.assistedreminder2023.data.entity.Reminder
 import androidx.compose.foundation.clickable
@@ -30,9 +30,9 @@ import com.rannunen.assistedreminder2023.util.viewModelProviderFactoryOf
 import java.text.SimpleDateFormat
 import java.util.*
 import coil.compose.AsyncImage
-import android.net.Uri
-import androidx.compose.ui.platform.LocalContext
-import java.io.InputStream
+import androidx.compose.foundation.Image
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 
 @Composable
 fun CategoryReminder(
@@ -83,7 +83,7 @@ private fun ReminderListItem(
     ConstraintLayout(modifier = Modifier
         .background(MaterialTheme.colors.secondary)
         .clickable { onClick() }) {
-        val (divider, reminderImage, reminderTitle, reminderDescription, reminderCategory, icon, date, reminderTime) = createRefs()
+        val (divider, reminderImage, reminderTitle, reminderDescription, icon, date, reminderTime) = createRefs()
         //Set dividers between alarms
         Divider(
             Modifier.constrainAs(divider){
@@ -92,10 +92,6 @@ private fun ReminderListItem(
                 width = Dimension.fillToConstraints
             }
         )
-        Log.d("Show image", reminder.reminderImage)
-
-        val context = LocalContext.current
-        val inputStream: InputStream? = context.contentResolver.openInputStream(Uri.parse(reminder.reminderImage))
 
         AsyncImage(
             model = reminder.reminderImage,
@@ -104,6 +100,13 @@ private fun ReminderListItem(
                 width = Dimension.value(150.dp)
                 height = Dimension.value(150.dp)
             }
+        )
+        Image(
+            bitmap  = byteArrayToBitmap(reminder.reminderCameraImage)?: dummyBitMap(),
+           contentDescription = "Taken image",
+            modifier = Modifier
+                .width(150.dp)
+                .height(150.dp)
         )
         // Title
         Text(
@@ -219,4 +222,17 @@ private fun formatToStringTime(long: Long): String {
     val time = Date(long)
     val format = SimpleDateFormat("HH.mm")
     return format.format(time)
+}
+
+private fun byteArrayToBitmap(image: ByteArray?): ImageBitmap {
+    return if (image != null && image.isNotEmpty()) {
+        BitmapFactory.decodeByteArray(image, 0, image.size).asImageBitmap()
+    } else {
+        dummyBitMap()
+    }
+}
+
+// Create a dummy bitmap if byteArrayToBitMap function fails
+private fun dummyBitMap(): ImageBitmap {
+    return ImageBitmap(1, 1)
 }

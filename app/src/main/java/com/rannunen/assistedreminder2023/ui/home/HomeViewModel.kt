@@ -90,7 +90,7 @@ private fun setSpotNotification() {
         .setRequiredNetworkType(NetworkType.CONNECTED) // Needs internet
         .build()
 
-    val spotWorker = PeriodicWorkRequestBuilder<SpotPriceWorker>(30, TimeUnit.SECONDS)
+    val spotWorker = PeriodicWorkRequestBuilder<SpotPriceWorker>(60, TimeUnit.MINUTES)
         .setInitialDelay(10, TimeUnit.SECONDS)
         .setConstraints(constraints)
         .build()

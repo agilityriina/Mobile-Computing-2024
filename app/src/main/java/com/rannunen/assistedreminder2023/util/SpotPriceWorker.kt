@@ -1,8 +1,6 @@
 package com.rannunen.assistedreminder2023.util
 
 import android.content.Context
-import android.util.Log
-import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.rannunen.assistedreminder2023.ui.api.SpotApi

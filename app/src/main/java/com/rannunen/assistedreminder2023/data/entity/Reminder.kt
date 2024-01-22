@@ -27,6 +27,6 @@ data class Reminder(
     @ColumnInfo(name = "reminder_category_id") val reminderCategoryId: Long,
     @ColumnInfo(name = "reminder_description") val reminderDescription: String,
     @ColumnInfo(name = "reminder_time") val reminderTime: Long,
-    @ColumnInfo(name = "reminder_image") val reminderImage: String
-    //add the information of the reminder, image?
+    @ColumnInfo(name = "reminder_image") val reminderImage: String? = null,
+    @ColumnInfo(name = "camera_image") val reminderCameraImage: ByteArray? = null
 )

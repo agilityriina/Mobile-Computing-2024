@@ -4,15 +4,10 @@ import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -29,15 +24,19 @@ class MainActivity : ComponentActivity() {
                 Surface(
                     color = MaterialTheme.colors.background)
                 {
-                    val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+                    val notificationPermissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
+                    val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
 
                     LaunchedEffect(key1 = Unit){
-                        permissionState.launchPermissionRequest()
+                        notificationPermissionState.launchPermissionRequest()
+                        cameraPermissionState.launchPermissionRequest()
+
                     }
-                    if (permissionState.status.isGranted){
+                    if (notificationPermissionState.status.isGranted && cameraPermissionState.status.isGranted){
                         ReminderApp()
                     }else{
-                        if(permissionState.status.shouldShowRationale){
+                        if(notificationPermissionState.status.shouldShowRationale ||
+                            cameraPermissionState.status.shouldShowRationale){
                         }else {
                             Text("Permissions needed")
                         }

@@ -3,11 +3,14 @@ package com.rannunen.assistedreminder2023.ui.Reminder
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Bitmap
 import android.util.Log
 import android.widget.DatePicker
 import android.widget.TimePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -25,6 +29,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rannunen.assistedreminder2023.data.entity.Category
 import com.rannunen.assistedreminder2023.data.entity.Reminder
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -55,6 +60,7 @@ fun Reminder(
             Log.d("PhotoPicker", "No media selected")
         }
     }
+
     // Picking a date
     val pickerCalendar = Calendar.getInstance()
 
@@ -83,6 +89,16 @@ fun Reminder(
         },  pickerHour, pickerMinute, true
     )
 
+    // Bitmap for the image taken
+    var takenPicture by remember { mutableStateOf<Bitmap?>(null) }
+
+    // Launcher for the camera
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview(),
+        onResult = { imagePreview ->
+            takenPicture = imagePreview
+        }
+    )
 
     Surface {
         Column(
@@ -192,7 +208,30 @@ fun Reminder(
                     modifier = Modifier.fillMaxWidth()
 
                 ) {
-                    Text(text = "Add image", color = MaterialTheme.colors.primaryVariant)
+                    Text(text = "Add image from phone", color = MaterialTheme.colors.primaryVariant)
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Button(
+                    enabled = true,
+                    onClick = {cameraLauncher.launch()
+                    },
+                    modifier = Modifier.fillMaxWidth()
+
+                ) {
+                    Text(text = "Take picture", color = MaterialTheme.colors.primaryVariant)
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+                Row {
+                    // Show the image taken with phone here if it was
+                    takenPicture?.let {
+                        Image(
+                            bitmap = it.asImageBitmap(),
+                            contentDescription = "Taken image",
+                            modifier = Modifier
+                                .width(150.dp)
+                                .height(150.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -207,7 +246,8 @@ fun Reminder(
                                     reminderDate = stringToLong(pickerDate.value),
                                     reminderTime = stringToLongTime(pickerTime.value),
                                     reminderCategoryId = getCategoryId(viewState.categories, category.value),
-                                    reminderImage = uriImage.value
+                                    reminderImage = uriImage.value,
+                                    reminderCameraImage = bitmapToByteArray(takenPicture)
                                 )
                             )
                         }
@@ -237,7 +277,14 @@ fun stringToLongTime(time: String): Long {
     val returnDate = SimpleDateFormat("HH.mm")
     return returnDate.parse(time).time
 }
-
+// Convert image to bytearray
+fun bitmapToByteArray(map: Bitmap?): ByteArray{
+    val stream = ByteArrayOutputStream()
+    if (map != null) {
+        map.compress(Bitmap.CompressFormat.PNG, 100, stream)
+    }
+    return stream.toByteArray()
+}
 @Composable
 // Composable for the dropdown
 private fun CategoryListDropdown(
